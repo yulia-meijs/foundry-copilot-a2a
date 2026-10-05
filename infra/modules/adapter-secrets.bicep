@@ -7,16 +7,7 @@ param keyVaultName string
 param copilotStudioClientSecret string
 
 @secure()
-param tweedeKamerDirectConnectUrl string
-
-@secure()
 param reverserClassicDirectConnectUrl string
-
-@secure()
-param reverserNewDirectConnectUrl string
-
-@secure()
-param aiSearchVragenDirectConnectUrl string
 
 @secure()
 param orchestratorDirectConnectUrl string
@@ -34,39 +25,12 @@ resource copilotClientSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = {
   }
 }
 
-resource tweedeKamerUrl 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = {
-  parent: keyVault
-  name: 'tweede-kamer-direct-connect-url'
-  properties: {
-    contentType: 'Copilot Studio direct-connect URL'
-    value: tweedeKamerDirectConnectUrl
-  }
-}
-
 resource reverserClassicUrl 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = {
   parent: keyVault
   name: 'reverser-classic-direct-connect-url'
   properties: {
     contentType: 'Copilot Studio direct-connect URL'
     value: reverserClassicDirectConnectUrl
-  }
-}
-
-resource reverserNewUrl 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = {
-  parent: keyVault
-  name: 'reverser-new-direct-connect-url'
-  properties: {
-    contentType: 'Copilot Studio direct-connect URL'
-    value: reverserNewDirectConnectUrl
-  }
-}
-
-resource aiSearchVragenUrl 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = {
-  parent: keyVault
-  name: 'ai-search-vragen-direct-connect-url'
-  properties: {
-    contentType: 'Copilot Studio direct-connect URL'
-    value: aiSearchVragenDirectConnectUrl
   }
 }
 

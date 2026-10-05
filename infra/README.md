@@ -230,15 +230,13 @@ Optional overrides:
 - `appServicePlanSku` (default `B1`).
 - `linuxFxVersion` (default `DOTNETCORE|10.0`).
 
-Set the required secret inputs in the current process. They are read by the
-parameter file and never stored in source:
+Set the required secret inputs for the minimal Orchestrator plus Reverser Classic
+topology in the current process. They are read by the parameter file and never
+stored in source:
 
 ```powershell
 $env:COPILOT_STUDIO_CLIENT_SECRET = Read-Host 'Copilot Studio client secret' -MaskInput
-$env:COPILOT_STUDIO_TWEEDE_KAMER_URL = Read-Host 'Tweede Kamer direct-connect URL' -MaskInput
 $env:COPILOT_STUDIO_REVERSER_CLASSIC_URL = Read-Host 'Reverser Classic direct-connect URL' -MaskInput
-$env:COPILOT_STUDIO_REVERSER_NEW_URL = Read-Host 'Reverser New direct-connect URL' -MaskInput
-$env:COPILOT_STUDIO_AI_SEARCH_VRAGEN_URL = Read-Host 'AI Search Vragen direct-connect URL' -MaskInput
 $env:COPILOT_STUDIO_ORCHESTRATOR_URL = Read-Host 'Orchestrator direct-connect URL' -MaskInput
 ```
 

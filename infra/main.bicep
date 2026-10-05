@@ -37,20 +37,8 @@ param foundryAgentName string
 param copilotStudioClientSecret string
 
 @secure()
-@description('Direct-connect URL for the Tweede Kamer Copilot Studio agent.')
-param tweedeKamerDirectConnectUrl string
-
-@secure()
 @description('Direct-connect URL for the standard-harness Reverser Classic agent.')
 param reverserClassicDirectConnectUrl string
-
-@secure()
-@description('Direct-connect URL for the Reverser New Copilot Studio agent.')
-param reverserNewDirectConnectUrl string
-
-@secure()
-@description('Direct-connect URL for the AI Search Vragen Copilot Studio agent.')
-param aiSearchVragenDirectConnectUrl string
 
 @secure()
 @description('Direct-connect URL for the Orchestrator Copilot Studio agent.')
@@ -157,10 +145,7 @@ module adapterSecrets 'modules/adapter-secrets.bicep' = {
   params: {
     keyVaultName: adapterFoundation.outputs.keyVaultName
     copilotStudioClientSecret: copilotStudioClientSecret
-    tweedeKamerDirectConnectUrl: tweedeKamerDirectConnectUrl
     reverserClassicDirectConnectUrl: reverserClassicDirectConnectUrl
-    reverserNewDirectConnectUrl: reverserNewDirectConnectUrl
-    aiSearchVragenDirectConnectUrl: aiSearchVragenDirectConnectUrl
     orchestratorDirectConnectUrl: orchestratorDirectConnectUrl
   }
 }

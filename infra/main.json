@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.46.1.21595",
-      "templateHash": "9715216636720669241"
+      "templateHash": "664312364280105205"
     },
     "name": "Foundry Copilot A2A Citadel infrastructure",
     "description": "Deploys the A2A adapter, APIM governance gateway, Microsoft Foundry project, and shared monitoring."
@@ -79,28 +79,10 @@
         "description": "Client secret for the backend application registration. Stored in Key Vault."
       }
     },
-    "tweedeKamerDirectConnectUrl": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Direct-connect URL for the Tweede Kamer Copilot Studio agent."
-      }
-    },
     "reverserClassicDirectConnectUrl": {
       "type": "securestring",
       "metadata": {
         "description": "Direct-connect URL for the standard-harness Reverser Classic agent."
-      }
-    },
-    "reverserNewDirectConnectUrl": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Direct-connect URL for the Reverser New Copilot Studio agent."
-      }
-    },
-    "aiSearchVragenDirectConnectUrl": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Direct-connect URL for the AI Search Vragen Copilot Studio agent."
       }
     },
     "orchestratorDirectConnectUrl": {
@@ -527,17 +509,8 @@
           "copilotStudioClientSecret": {
             "value": "[parameters('copilotStudioClientSecret')]"
           },
-          "tweedeKamerDirectConnectUrl": {
-            "value": "[parameters('tweedeKamerDirectConnectUrl')]"
-          },
           "reverserClassicDirectConnectUrl": {
             "value": "[parameters('reverserClassicDirectConnectUrl')]"
-          },
-          "reverserNewDirectConnectUrl": {
-            "value": "[parameters('reverserNewDirectConnectUrl')]"
-          },
-          "aiSearchVragenDirectConnectUrl": {
-            "value": "[parameters('aiSearchVragenDirectConnectUrl')]"
           },
           "orchestratorDirectConnectUrl": {
             "value": "[parameters('orchestratorDirectConnectUrl')]"
@@ -550,7 +523,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.46.1.21595",
-              "templateHash": "14504037307499657974"
+              "templateHash": "14245821810102120451"
             },
             "name": "A2A adapter secrets",
             "description": "Stores the adapter Copilot Studio credentials and direct-connect URLs in Key Vault."
@@ -562,16 +535,7 @@
             "copilotStudioClientSecret": {
               "type": "securestring"
             },
-            "tweedeKamerDirectConnectUrl": {
-              "type": "securestring"
-            },
             "reverserClassicDirectConnectUrl": {
-              "type": "securestring"
-            },
-            "reverserNewDirectConnectUrl": {
-              "type": "securestring"
-            },
-            "aiSearchVragenDirectConnectUrl": {
               "type": "securestring"
             },
             "orchestratorDirectConnectUrl": {
@@ -591,37 +555,10 @@
             {
               "type": "Microsoft.KeyVault/vaults/secrets",
               "apiVersion": "2024-11-01",
-              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'tweede-kamer-direct-connect-url')]",
-              "properties": {
-                "contentType": "Copilot Studio direct-connect URL",
-                "value": "[parameters('tweedeKamerDirectConnectUrl')]"
-              }
-            },
-            {
-              "type": "Microsoft.KeyVault/vaults/secrets",
-              "apiVersion": "2024-11-01",
               "name": "[format('{0}/{1}', parameters('keyVaultName'), 'reverser-classic-direct-connect-url')]",
               "properties": {
                 "contentType": "Copilot Studio direct-connect URL",
                 "value": "[parameters('reverserClassicDirectConnectUrl')]"
-              }
-            },
-            {
-              "type": "Microsoft.KeyVault/vaults/secrets",
-              "apiVersion": "2024-11-01",
-              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'reverser-new-direct-connect-url')]",
-              "properties": {
-                "contentType": "Copilot Studio direct-connect URL",
-                "value": "[parameters('reverserNewDirectConnectUrl')]"
-              }
-            },
-            {
-              "type": "Microsoft.KeyVault/vaults/secrets",
-              "apiVersion": "2024-11-01",
-              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'ai-search-vragen-direct-connect-url')]",
-              "properties": {
-                "contentType": "Copilot Studio direct-connect URL",
-                "value": "[parameters('aiSearchVragenDirectConnectUrl')]"
               }
             },
             {
@@ -891,7 +828,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.46.1.21595",
-              "templateHash": "4396521811868097975"
+              "templateHash": "5127831123615393155"
             },
             "name": "A2A adapter hosting",
             "description": "Deploys the Linux App Service Plan and Linux Web App for the adapter."
@@ -997,20 +934,9 @@
               "CopilotStudio__ClientSecret": "[format('@Microsoft.KeyVault(SecretUri={0}/copilot-client-secret)', variables('keyVaultSecretBaseUrl'))]",
               "CopilotStudio__Cloud": "Prod",
               "CopilotStudio__DefaultAgent": "reverser-classic",
-              "CopilotStudio__Agents__tweede_kamer__Id": "tweede-kamer",
-              "CopilotStudio__Agents__tweede_kamer__DisplayName": "Tweede Kamer",
-              "CopilotStudio__Agents__tweede_kamer__Harness": "GitHubCopilot",
-              "CopilotStudio__Agents__tweede_kamer__DirectConnectUrl": "[format('@Microsoft.KeyVault(SecretUri={0}/tweede-kamer-direct-connect-url)', variables('keyVaultSecretBaseUrl'))]",
               "CopilotStudio__Agents__reverser_classic__Id": "reverser-classic",
               "CopilotStudio__Agents__reverser_classic__DisplayName": "Reverser Classic",
               "CopilotStudio__Agents__reverser_classic__DirectConnectUrl": "[format('@Microsoft.KeyVault(SecretUri={0}/reverser-classic-direct-connect-url)', variables('keyVaultSecretBaseUrl'))]",
-              "CopilotStudio__Agents__reverser_new__Id": "reverser-new",
-              "CopilotStudio__Agents__reverser_new__DisplayName": "Reverser New",
-              "CopilotStudio__Agents__reverser_new__Harness": "GitHubCopilot",
-              "CopilotStudio__Agents__reverser_new__DirectConnectUrl": "[format('@Microsoft.KeyVault(SecretUri={0}/reverser-new-direct-connect-url)', variables('keyVaultSecretBaseUrl'))]",
-              "CopilotStudio__Agents__ai_search_vragen__Id": "ai-search-vragen",
-              "CopilotStudio__Agents__ai_search_vragen__DisplayName": "AI Search Vragen",
-              "CopilotStudio__Agents__ai_search_vragen__DirectConnectUrl": "[format('@Microsoft.KeyVault(SecretUri={0}/ai-search-vragen-direct-connect-url)', variables('keyVaultSecretBaseUrl'))]",
               "CopilotStudio__Agents__orchestrator__DisplayName": "Orchestrator",
               "CopilotStudio__Agents__orchestrator__DirectConnectUrl": "[format('@Microsoft.KeyVault(SecretUri={0}/orchestrator-direct-connect-url)', variables('keyVaultSecretBaseUrl'))]",
               "Foundry__Agents__web_research__Id": "web-research",
@@ -1188,7 +1114,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.46.1.21595",
-              "templateHash": "7616013045258466155"
+              "templateHash": "12949558055973246134"
             },
             "name": "Citadel A2A gateway",
             "description": "Deploys API Management as a governed delegated-OAuth entry point for the A2A adapter."
@@ -1257,9 +1183,9 @@
             }
           },
           "variables": {
-            "$fxv#0": "<policies>\r\n  <inbound>\r\n    <cors allow-credentials=\"false\" terminate-unmatched-request=\"true\">\r\n      <allowed-origins>\r\n        __ALLOWED_ORIGINS__\r\n      </allowed-origins>\r\n      <allowed-methods preflight-result-max-age=\"300\">\r\n        <method>GET</method>\r\n        <method>POST</method>\r\n      </allowed-methods>\r\n      <allowed-headers>\r\n        <header>Authorization</header>\r\n        <header>Content-Type</header>\r\n        <header>A2A-Version</header>\r\n        <header>X-Copilot-Agent</header>\r\n        <header>X-A2A-Chain-Target</header>\r\n        <header>X-Correlation-ID</header>\r\n        <header>traceparent</header>\r\n        <header>tracestate</header>\r\n      </allowed-headers>\r\n      <expose-headers>\r\n        <header>X-Trace-Id</header>\r\n        <header>X-Correlation-ID</header>\r\n        <header>WWW-Authenticate</header>\r\n        <header>Retry-After</header>\r\n      </expose-headers>\r\n    </cors>\r\n    <base />\r\n    __BACKEND_HEADERS__\r\n    <set-header name=\"X-Correlation-ID\" exists-action=\"skip\">\r\n      <value>@(context.RequestId.ToString())</value>\r\n    </set-header>\r\n  </inbound>\r\n  <backend>\r\n    <forward-request timeout=\"120\" buffer-response=\"false\" />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n    <set-header name=\"X-Correlation-ID\" exists-action=\"override\">\r\n      <value>@(context.Request.Headers.GetValueOrDefault(\"X-Correlation-ID\", context.RequestId.ToString()))</value>\r\n    </set-header>\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n    <set-header name=\"X-Correlation-ID\" exists-action=\"override\">\r\n      <value>@(context.Request.Headers.GetValueOrDefault(\"X-Correlation-ID\", context.RequestId.ToString()))</value>\r\n    </set-header>\r\n  </on-error>\r\n</policies>\r\n",
-            "$fxv#1": "<policies>\r\n  <inbound>\r\n    <base />\r\n    <validate-jwt header-name=\"Authorization\"\r\n                  require-scheme=\"Bearer\"\r\n                  failed-validation-httpcode=\"401\"\r\n                  failed-validation-error-message=\"Unauthorized. A delegated adapter API token is required.\"\r\n                  output-token-variable-name=\"validatedJwt\"\r\n                  clock-skew=\"60\">\r\n      <openid-config url=\"__ENTRA_LOGIN_ENDPOINT__{{entra-tenant-id}}/v2.0/.well-known/openid-configuration\" />\r\n      <audiences>\r\n        <audience>{{adapter-api-audience}}</audience>\r\n        <audience>{{adapter-api-bare-audience}}</audience>\r\n      </audiences>\r\n      <issuers>\r\n        <issuer>__ENTRA_LOGIN_ENDPOINT__{{entra-tenant-id}}/v2.0</issuer>\r\n        <issuer>https://sts.windows.net/{{entra-tenant-id}}/</issuer>\r\n      </issuers>\r\n      <required-claims>\r\n        <claim name=\"scp\" match=\"any\" separator=\" \">\r\n          <value>{{adapter-delegated-scope}}</value>\r\n        </claim>\r\n        <claim name=\"tid\" match=\"all\">\r\n          <value>{{entra-tenant-id}}</value>\r\n        </claim>\r\n      </required-claims>\r\n    </validate-jwt>\r\n    <rate-limit-by-key calls=\"__RATE_LIMIT_CALLS__\"\r\n                       renewal-period=\"60\"\r\n                       counter-key='@(context.Api.Id + \":\" + context.Operation.Id + \":\" + ((Jwt)context.Variables[\"validatedJwt\"]).Claims.GetValueOrDefault(\"tid\", \"unknown\") + \":\" + ((Jwt)context.Variables[\"validatedJwt\"]).Claims.GetValueOrDefault(\"oid\", \"unknown\"))' />\r\n    __REQUEST_VALIDATION__\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>\r\n",
-            "$fxv#2": "<validate-content unspecified-content-type-action=\"prevent\"\r\n                  max-size=\"1048576\"\r\n                  size-exceeded-action=\"prevent\"\r\n                  errors-variable-name=\"requestBodyValidation\">\r\n  <content type=\"application/json\" validate-as=\"json\" action=\"prevent\" />\r\n</validate-content>\r\n",
+            "$fxv#0": "<policies>\n  <inbound>\n    <cors allow-credentials=\"false\" terminate-unmatched-request=\"true\">\n      <allowed-origins>\n        __ALLOWED_ORIGINS__\n      </allowed-origins>\n      <allowed-methods preflight-result-max-age=\"300\">\n        <method>GET</method>\n        <method>POST</method>\n      </allowed-methods>\n      <allowed-headers>\n        <header>Authorization</header>\n        <header>Content-Type</header>\n        <header>A2A-Version</header>\n        <header>X-Copilot-Agent</header>\n        <header>X-A2A-Chain-Target</header>\n        <header>X-Correlation-ID</header>\n        <header>traceparent</header>\n        <header>tracestate</header>\n      </allowed-headers>\n      <expose-headers>\n        <header>X-Trace-Id</header>\n        <header>X-Correlation-ID</header>\n        <header>WWW-Authenticate</header>\n        <header>Retry-After</header>\n      </expose-headers>\n    </cors>\n    <base />\n    __BACKEND_HEADERS__\n    <set-header name=\"X-Correlation-ID\" exists-action=\"skip\">\n      <value>@(context.RequestId.ToString())</value>\n    </set-header>\n  </inbound>\n  <backend>\n    <forward-request timeout=\"120\" buffer-response=\"false\" />\n  </backend>\n  <outbound>\n    <base />\n    <set-header name=\"X-Correlation-ID\" exists-action=\"override\">\n      <value>@(context.Request.Headers.GetValueOrDefault(\"X-Correlation-ID\", context.RequestId.ToString()))</value>\n    </set-header>\n  </outbound>\n  <on-error>\n    <base />\n    <set-header name=\"X-Correlation-ID\" exists-action=\"override\">\n      <value>@(context.Request.Headers.GetValueOrDefault(\"X-Correlation-ID\", context.RequestId.ToString()))</value>\n    </set-header>\n  </on-error>\n</policies>\n",
+            "$fxv#1": "<policies>\n  <inbound>\n    <base />\n    <validate-jwt header-name=\"Authorization\"\n                  require-scheme=\"Bearer\"\n                  failed-validation-httpcode=\"401\"\n                  failed-validation-error-message=\"Unauthorized. A delegated adapter API token is required.\"\n                  output-token-variable-name=\"validatedJwt\"\n                  clock-skew=\"60\">\n      <openid-config url=\"__ENTRA_LOGIN_ENDPOINT__{{entra-tenant-id}}/v2.0/.well-known/openid-configuration\" />\n      <audiences>\n        <audience>{{adapter-api-audience}}</audience>\n        <audience>{{adapter-api-bare-audience}}</audience>\n      </audiences>\n      <issuers>\n        <issuer>__ENTRA_LOGIN_ENDPOINT__{{entra-tenant-id}}/v2.0</issuer>\n        <issuer>https://sts.windows.net/{{entra-tenant-id}}/</issuer>\n      </issuers>\n      <required-claims>\n        <claim name=\"scp\" match=\"any\" separator=\" \">\n          <value>{{adapter-delegated-scope}}</value>\n        </claim>\n        <claim name=\"tid\" match=\"all\">\n          <value>{{entra-tenant-id}}</value>\n        </claim>\n      </required-claims>\n    </validate-jwt>\n    <rate-limit-by-key calls=\"__RATE_LIMIT_CALLS__\"\n                       renewal-period=\"60\"\n                       counter-key='@(context.Api.Id + \":\" + context.Operation.Id + \":\" + ((Jwt)context.Variables[\"validatedJwt\"]).Claims.GetValueOrDefault(\"tid\", \"unknown\") + \":\" + ((Jwt)context.Variables[\"validatedJwt\"]).Claims.GetValueOrDefault(\"oid\", \"unknown\"))' />\n    __REQUEST_VALIDATION__\n  </inbound>\n  <backend>\n    <base />\n  </backend>\n  <outbound>\n    <base />\n  </outbound>\n  <on-error>\n    <base />\n  </on-error>\n</policies>\n",
+            "$fxv#2": "<validate-content unspecified-content-type-action=\"prevent\"\n                  max-size=\"1048576\"\n                  size-exceeded-action=\"prevent\"\n                  errors-variable-name=\"requestBodyValidation\">\n  <content type=\"application/json\" validate-as=\"json\" action=\"prevent\" />\n</validate-content>\n",
             "apiManagementServiceContributorRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '312a565d-c81f-4fd8-895a-4e21e48d571c')]",
             "readerRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
             "adapterBareAudience": "[replace(parameters('adapterApiAudience'), 'api://', '')]",
@@ -1269,7 +1195,7 @@
             "originElements": "[map(parameters('allowedOrigins'), lambda('origin', format('<origin>{0}</origin>', replace(replace(replace(lambdaVariables('origin'), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'))))]",
             "apiPolicyValue": "[replace(replace(variables('$fxv#0'), '__ALLOWED_ORIGINS__', join(variables('originElements'), '')), '__BACKEND_HEADERS__', '')]",
             "delegatedPolicyTemplate": "[replace(variables('$fxv#1'), '__ENTRA_LOGIN_ENDPOINT__', parameters('entraLoginEndpoint'))]",
-            "discoveryPolicyValue": "<policies>\r\n  <inbound>\r\n    <cors allow-credentials=\"false\" terminate-unmatched-request=\"true\">\r\n      <allowed-origins>\r\n        <origin>*</origin>\r\n      </allowed-origins>\r\n      <allowed-methods preflight-result-max-age=\"300\">\r\n        <method>GET</method>\r\n      </allowed-methods>\r\n      <allowed-headers>\r\n        <header>Content-Type</header>\r\n        <header>A2A-Version</header>\r\n      </allowed-headers>\r\n    </cors>\r\n    <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>\r\n",
+            "discoveryPolicyValue": "<policies>\n  <inbound>\n    <cors allow-credentials=\"false\" terminate-unmatched-request=\"true\">\n      <allowed-origins>\n        <origin>*</origin>\n      </allowed-origins>\n      <allowed-methods preflight-result-max-age=\"300\">\n        <method>GET</method>\n      </allowed-methods>\n      <allowed-headers>\n        <header>Content-Type</header>\n        <header>A2A-Version</header>\n      </allowed-headers>\n    </cors>\n    <base />\n  </inbound>\n  <backend>\n    <base />\n  </backend>\n  <outbound>\n    <base />\n  </outbound>\n  <on-error>\n    <base />\n  </on-error>\n</policies>\n",
             "runtimePolicyValue": "[replace(replace(variables('delegatedPolicyTemplate'), '__RATE_LIMIT_CALLS__', '60'), '__REQUEST_VALIDATION__', variables('$fxv#2'))]",
             "tracePolicyValue": "[replace(replace(variables('delegatedPolicyTemplate'), '__RATE_LIMIT_CALLS__', '600'), '__REQUEST_VALIDATION__', '')]"
           },

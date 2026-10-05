@@ -9,46 +9,37 @@
       "value": "eastus"
     },
     "adapterLocation": {
-      "value": "westus2"
+      "value": "eastus2"
     },
     "tenantId": {
-      "value": "63645c73-a00c-4659-b911-eb6c4c2d4a8f"
+      "value": "089c11ec-2c43-4d8e-b1b4-13f7a0ca1344"
     },
     "accessPrincipalId": {
-      "value": "00000000-0000-0000-0000-000000000000"
+      "value": "066132c6-2f7e-4b2e-975f-85817c6486de"
     },
     "adapterApiAudience": {
-      "value": "api://replace-with-adapter-client-id"
+      "value": "api://00000000-0000-0000-0000-000000000001"
     },
     "copilotStudioClientId": {
-      "value": "replace-with-backend-client-id"
+      "value": "00000000-0000-0000-0000-000000000001"
     },
     "foundryAgentName": {
-      "value": "replace-with-foundry-agent-name"
+      "value": "preflight-agent"
     },
     "publisherName": {
       "value": "Foundry Copilot A2A"
     },
     "publisherEmail": {
-      "value": "replace-with-platform-owner@example.com"
+      "value": "yulia.kriulina@gmail.com"
     },
     "copilotStudioClientSecret": {
-      "value": "placeholder"
-    },
-    "tweedeKamerDirectConnectUrl": {
-      "value": "https://example/x"
+      "value": "preflight-only"
     },
     "reverserClassicDirectConnectUrl": {
-      "value": "https://example/x"
-    },
-    "reverserNewDirectConnectUrl": {
-      "value": "https://example/x"
-    },
-    "aiSearchVragenDirectConnectUrl": {
-      "value": "https://example/x"
+      "value": "https://example.invalid/reverser-classic"
     },
     "orchestratorDirectConnectUrl": {
-      "value": "https://example/x"
+      "value": "https://example.invalid/orchestrator"
     },
     "adapterAllowedOrigins": {
       "value": [
@@ -57,7 +48,7 @@
     },
     "specialistAgentIds": {
       "value": [
-        "ai-search-vragen"
+        "reverser-classic"
       ]
     },
     "appServicePlanSku": {

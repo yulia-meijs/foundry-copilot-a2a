@@ -2,8 +2,8 @@ using './main.bicep'
 
 param environmentName = 'dev'
 param location = 'eastus'
-param adapterLocation = 'westus2'
-param tenantId = '63645c73-a00c-4659-b911-eb6c4c2d4a8f'
+param adapterLocation = 'eastus2'
+param tenantId = readEnvironmentVariable('AZURE_TENANT_ID')
 
 param accessPrincipalId = readEnvironmentVariable('ACCESS_PRINCIPAL_OBJECT_ID')
 param adapterApiAudience = readEnvironmentVariable('ADAPTER_API_AUDIENCE')
@@ -14,10 +14,7 @@ param publisherEmail = readEnvironmentVariable('APIM_PUBLISHER_EMAIL')
 
 // Set these process environment variables before compiling or deploying this parameter file.
 param copilotStudioClientSecret = readEnvironmentVariable('COPILOT_STUDIO_CLIENT_SECRET')
-param tweedeKamerDirectConnectUrl = readEnvironmentVariable('COPILOT_STUDIO_TWEEDE_KAMER_URL')
 param reverserClassicDirectConnectUrl = readEnvironmentVariable('COPILOT_STUDIO_REVERSER_CLASSIC_URL')
-param reverserNewDirectConnectUrl = readEnvironmentVariable('COPILOT_STUDIO_REVERSER_NEW_URL')
-param aiSearchVragenDirectConnectUrl = readEnvironmentVariable('COPILOT_STUDIO_AI_SEARCH_VRAGEN_URL')
 param orchestratorDirectConnectUrl = readEnvironmentVariable('COPILOT_STUDIO_ORCHESTRATOR_URL')
 
 param adapterAllowedOrigins = [
@@ -25,7 +22,7 @@ param adapterAllowedOrigins = [
 ]
 
 param specialistAgentIds = [
-  'ai-search-vragen'
+  'reverser-classic'
 ]
 
 param appServicePlanSku = 'B1'
