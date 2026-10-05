@@ -21,7 +21,9 @@ The solution exposes A2A JSON-RPC endpoints through API Management and a .NET ad
 | APIM Hub | GET | `/hub/.well-known/agent-card.json` | None | Public A2A agent card |
 | APIM Hub | GET | `/hub/a2a-agents/{agentId}/.well-known/agent-card.json` | Agent ID | Public specialist A2A agent card |
 | APIM Hub | POST | `/hub/a2a/copilot-studio` | A2A JSON-RPC message and Hub bearer token | A2A task/message stream |
-| APIM Hub | POST | `/hub/a2a-agents/{agentId}/a2a` | A2A JSON-RPC message and Hub bearer token | Specialist A2A task/message stream |
+| APIM Hub | POST | `/hub/a2a-agents/{agentId}/a2a` | A2A JSON-RPC message and Hub bearer token | Specialist A2A task/message stream for callers explicitly configured for the Hub audience |
+| Citadel APIM | GET | `/<api-path>/a2a-agents/{agentId}/.well-known/agent-card.json` | Agent ID | Public specialist A2A agent card |
+| Citadel APIM | POST | `/<api-path>/a2a-agents/{agentId}/a2a` | A2A JSON-RPC message and adapter bearer token | Native Copilot Studio specialist callback |
 | Adapter | GET | `/api/agents` | None | `CopilotAgentCatalog` |
 | Adapter | GET | `/api/connectivity` | Adapter bearer token when authentication is enabled | Connectivity diagnostics |
 | Adapter | GET | `/api/traces/{traceId}` | Trace ID and adapter bearer token | Sanitized adapter trace |
@@ -29,6 +31,8 @@ The solution exposes A2A JSON-RPC endpoints through API Management and a .NET ad
 | Adapter | POST | `/a2a-agents/{agentId}/a2a` | A2A JSON-RPC message and adapter bearer token | Target-specific A2A task/message stream |
 
 Public agent-card operations deliberately allow anonymous discovery. Runtime, trace, and connectivity operations require a correctly scoped delegated token when authentication is enabled.
+
+The Hub and Citadel rows are separate logical trust boundaries and may be separate APIM APIs or separate APIM services. The repository's two infrastructure stacks deploy them separately. Do not apply the Hub OBO policy to an adapter-audience Citadel specialist callback.
 
 ## Management & Observability Endpoints
 
@@ -60,11 +64,10 @@ The browser and adapter use JSON with A2A 1.0 plus compatibility handling for A2
 | A | Browser SPA | `api://<hub-client-id>` | Calling APIM Hub |
 | B | APIM Hub on behalf of the user | `api://<adapter-client-id>` | Calling the adapter |
 | C | Adapter on behalf of the user | Power Platform or Copilot Studio scope | Calling the orchestrator through Direct Connect |
-| D | Copilot Studio A2A connection for the same user | `api://<hub-client-id>` | Orchestrator callback to the specialist APIM route |
-| E | APIM Hub on behalf of the user | `api://<adapter-client-id>` | Calling the target-specific adapter route |
-| F | Adapter on behalf of the user | Power Platform or Copilot Studio scope | Calling the specialist |
+| D | Copilot Studio A2A connection for the same user | `api://<adapter-client-id>` | Calling the Citadel specialist APIM route |
+| E | Adapter on behalf of the user | Power Platform or Copilot Studio scope | Calling the specialist |
 
-Tokens A through F represent separate issuances. They retain the same user identity, but a token is never deliberately forwarded to a component whose audience does not match it.
+Tokens A through E describe the logical audience transitions. With generic OAuth, the connection may reuse a valid adapter-audience user token supplied through `signin/tokenExchange`; with the experimental connector OBO configuration, the connection service issues a new adapter-audience Token D. In both cases, the specialist callback reaches APIM with the adapter audience. A token is never deliberately forwarded to a component whose audience does not match it.
 
 ### Browser to Hub
 
@@ -82,7 +85,9 @@ APIM replaces the inbound `Authorization` header with Token B. The adapter repea
 
 The UI's chain target is only an instruction to the native orchestrator; it is not proof that the specialist ran. The adapter asks the orchestrator to call the named A2A connected agent. Copilot Studio routing uses the connected agent's name, description, and agent card to decide when to invoke it.
 
-The connected-agent connection obtains Token D for the Hub as the same user. The orchestrator calls the public specialist route through APIM. APIM repeats Hub validation and Hub-to-adapter OBO to create Token E. The target-specific adapter route selects the specialist and performs adapter-to-Power-Platform OBO to create Token F. Only entry into that route is recorded as actual specialist tool execution.
+The repository's validated native chain does not return through the Hub-audience policy. The connected-agent connection obtains or receives Token D for the **adapter** audience as the same user, then calls the Citadel specialist route through APIM. Citadel validates the adapter audience and delegated scope and forwards Token D unchanged. The target-specific adapter route selects the specialist and performs adapter-to-Power-Platform OBO to create Token E. Only entry into that route is recorded as actual specialist tool execution.
+
+The Hub API also exposes a specialist route for callers explicitly configured to request the Hub scope. That variant performs another Hub-to-adapter OBO exchange, but it is distinct from the adapter-audience native connection validated in [Copilot Studio A2A connection lifecycle and consent](./copilot-studio-a2a-connections.md).
 
 ### Response composition
 
@@ -103,9 +108,10 @@ For native A2A connected agents, generic OAuth 2.0 is the supported configuratio
 ### Resilience and error behavior
 
 - APIM returns `401` for missing, invalid, wrong-tenant, wrong-audience, or wrong-scope tokens.
-- APIM returns `403` when its OBO request fails due to consent or Conditional Access; it exposes only a bounded Entra error code and never echoes token endpoint responses.
+- The Hub API returns `403` when its Hub-to-adapter OBO request fails due to consent or Conditional Access; it exposes only a bounded Entra error code and never echoes token endpoint responses.
+- The Citadel specialist policy does not perform Hub OBO; it validates and forwards the adapter-audience delegated token.
 - The adapter rejects wrong-audience assertions before OBO.
-- Copilot Studio and A2A orchestration clients do not retry whole turns because a retry could execute the specialist twice.
+- The Copilot Studio orchestrator client and outbound A2A chain clients do not retry whole turns because a retry could execute the specialist twice. The ordinary specialist SDK client retains the repository's standard outbound HTTP resilience handler.
 - Copilot Studio request timeout defaults to 60 seconds; Foundry/A2A chain calls default to 120 seconds.
 - Conversation state is isolated by user, agent, and A2A context and has a 30-minute sliding expiry.
 - There is no asynchronous queue. A2A streaming uses synchronous HTTP/SSE-style response updates.
@@ -116,6 +122,7 @@ For native A2A connected agents, generic OAuth 2.0 is the supported configuratio
 | --- | --- | --- | --- | --- | --- |
 | Browser UI | React/Vite and MSAL | Agent catalog and cards | Calls APIM Hub | MSAL session cache | Client timeline |
 | APIM Hub | APIM policies | Public A2A cards | JWT validation, OBO, rate limiting | Per-user token cache | Azure diagnostics |
+| Citadel APIM | APIM policies | Public specialist cards | Adapter-token validation and rate limiting | None | Azure diagnostics |
 | Adapter | ASP.NET Core and A2A hosting | Agent catalog and APIM discovery | No | MSAL, conversation, and idempotency caches | OpenTelemetry and Application Insights |
 | Copilot Studio | Managed agent runtime | Connected-agent card metadata | Native orchestration | Managed user connections | Provider telemetry |
 
@@ -161,29 +168,33 @@ sequenceDiagram
 %%{init: {"themeVariables": {"fontSize": "26px"}, "sequence": {"actorFontSize": 26, "messageFontSize": 24, "noteFontSize": 24, "messageMargin": 50}}}%%
 sequenceDiagram
     participant User as "User"
+    participant EntryAdapter as "Entry A2A Adapter"
     participant Orch as "Copilot Studio Orchestrator"
     participant Conn as "A2A Connection Service"
     participant Entra as "Microsoft Entra ID"
-    participant APIM as "APIM Specialist Route"
+    participant APIM as "Citadel Specialist API"
     participant Adapter as "A2A Specialist Route"
     participant Specialist as "Copilot Studio Specialist"
 
-    opt User connection is missing or stale
+    opt Copilot Studio emits an OAuth card for the adapter resource
+        Orch-->>EntryAdapter: OAuth card challenge
+        EntryAdapter->>Orch: signin tokenExchange with Token B
+    end
+    alt Generic OAuth connection is missing or stale
         Orch-->>User: Show connection or consent card
         User->>Entra: Authenticate or satisfy policy
-        Entra-->>Conn: User token set for A2A connection
+        Entra-->>Conn: Token D for adapter and same user
+    else Experimental connector OBO is enabled
+        Conn->>Entra: Exchange channel token for adapter scope
+        Entra-->>Conn: Token D for adapter and same user
     end
     Orch->>Conn: Invoke Reverser Classic connected agent
-    Conn->>Entra: Obtain Hub token for same user
-    Entra-->>Conn: Token D for Hub
     Conn->>APIM: POST specialist A2A runtime with Token D
-    APIM->>APIM: Validate Hub token and rate limit user
-    APIM->>Entra: OBO Token D for adapter scope
-    Entra-->>APIM: Token E for adapter and same user
-    APIM->>Adapter: Forward target-specific request with Token E
-    Adapter->>Entra: OBO Token E for Power Platform scope
-    Entra-->>Adapter: Token F for Power Platform and same user
-    Adapter->>Specialist: Direct Connect request with Token F
+    APIM->>APIM: Validate adapter token and rate limit user
+    APIM->>Adapter: Forward target-specific request with Token D
+    Adapter->>Entra: OBO Token D for Power Platform scope
+    Entra-->>Adapter: Token E for Power Platform and same user
+    Adapter->>Specialist: Direct Connect request with Token E
     Specialist-->>Adapter: Stream specialist result
     Adapter-->>APIM: A2A updates with attribution and citations
     APIM-->>Conn: Specialist A2A response
