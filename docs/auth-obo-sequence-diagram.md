@@ -2,6 +2,9 @@
 
 The solution exposes A2A JSON-RPC endpoints through API Management and a .NET adapter, with synchronous and streamed calls to Copilot Studio. Authentication uses chained Microsoft Entra delegated exchanges so each hop receives a token minted for its own audience.
 
+For intermittent connection prompts or a `404` that produces no APIM or App Service
+request, see [Copilot Studio pre-APIM 404 troubleshooting](./copilot-studio-pre-apim-404-troubleshooting.md).
+
 ## Service Catalog
 
 | Service | Port | Category | Purpose |
@@ -68,6 +71,22 @@ The browser and adapter use JSON with A2A 1.0 plus compatibility handling for A2
 | E | Adapter on behalf of the user | Power Platform or Copilot Studio scope | Calling the specialist |
 
 Tokens A through E describe the logical audience transitions. With generic OAuth, the connection may reuse a valid adapter-audience user token supplied through `signin/tokenExchange`; with the experimental connector OBO configuration, the connection service issues a new adapter-audience Token D. In both cases, the specialist callback reaches APIM with the adapter audience. A token is never deliberately forwarded to a component whose audience does not match it.
+
+### Access-token renewal and refresh tokens
+
+Most tokens shown above are short-lived access tokens. Their renewal is owned by the component that acquired them:
+
+| Component | How access continues after expiry | Application action required |
+| --- | --- | --- |
+| Browser SPA | MSAL silently renews Token A using its browser-managed session and token cache. It redirects the user only when silent renewal is no longer allowed. | Keep using `acquireTokenSilent` with an interactive fallback; never read or store a refresh token in application code. |
+| APIM Hub | APIM caches Token B only until shortly before expiry. On the next request it repeats OBO using the current Token A from the browser. | None. APIM does not need a stored user refresh token. |
+| Adapter | MSAL caches downstream access-token state. When necessary, the adapter repeats OBO using the current adapter-audience Token B or D supplied with that request. | None. Do not persist user refresh tokens in the adapter or Key Vault. |
+| Generic OAuth A2A connection | The connection requests `offline_access`. Power Platform securely stores and rotates the user's refresh token and obtains new Token D access tokens. | Configure `offline_access`, the token/refresh endpoint, and the connector client credential correctly. Do not handle the user's refresh token yourself. |
+| Experimental connector OBO | Power Platform silently exchanges the authenticated user's current channel token for Token D. The platform owns any connection/token state. | Maintain the connector OBO configuration and consent; do not assume or depend on direct refresh-token access. |
+
+An expired access token should normally be invisible to the user. A prompt is required only when silent renewal fails—for example after revocation, long inactivity, connector-client secret expiry, a Conditional Access sign-in-frequency or MFA challenge, account disablement, scope changes, or connection replacement.
+
+The connector consent-card bypass changes only whether Copilot Studio shows its confirmation card. It does not refresh tokens, repair stale connections, suppress Entra interaction when policy requires it, or replace the `offline_access` scope.
 
 ### Browser to Hub
 
